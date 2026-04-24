@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abarrotera - Rutas diarias y remisiones</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --line:#dfe5ef;
+      --text:#223047;
+      --muted:#6f7c91;
+      --primary:#2e6bff;
+      --primary-2:#eaf1ff;
+      --success:#0f9d58;
+      --success-bg:#eaf7f0;
+      --warning:#c77b00;
+      --warning-bg:#fff6e5;
+      --danger:#c62828;
+      --danger-bg:#fdecec;
+      --dark:#0f172a;
+      --chip:#eef2f7;
+      --shadow:0 12px 32px rgba(31,41,55,.08);
+      --radius:18px;
+
+      --panel:#ffffff;
+      --panel-2:#eef3ff;
+      --text-2:#162033;
+      --muted-2:#64748b;
+      --primary-demo:#1d4ed8;
+      --success-demo:#15803d;
+      --warning-demo:#b45309;
+      --danger-demo:#b91c1c;
+      --chip-demo:#eff6ff;
+      --line-demo:#d9e2f2;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .app{
+      max-width:1450px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .hero{
+      background:linear-gradient(135deg,#1f3b73 0%, #2e6bff 100%);
+      color:#fff;
+      border-radius:24px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:18px;
+      align-items:center;
+    }
+    .hero h1{margin:0 0 8px;font-size:30px}
+    .hero p{margin:0;color:rgba(255,255,255,.9);line-height:1.45}
+    .hero-stats{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+    }
+    .stat{
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:16px;
+      padding:14px;
+      backdrop-filter: blur(6px);
+    }
+    .stat small{display:block;opacity:.85;margin-bottom:6px}
+    .stat strong{font-size:28px}
+    .tabs{
+      display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 20px;
+    }
+    .tab{
+      background:#fff;border:1px solid var(--line);border-radius:999px;
+      padding:10px 16px;cursor:pointer;font-weight:600;color:var(--muted);
+    }
+    .tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+    .grid{
+      display:grid;
+      grid-template-columns:340px 1fr 420px;
+      gap:18px;
+      align-items:start;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-header{
+      padding:16px 18px;
+      border-bottom:1px solid var(--line);
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+    }
+    .card-header h3{margin:0;font-size:18px}
+    .card-body{padding:16px 18px}
+    .muted{color:var(--muted)}
+    .day-buttons{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+    }
+    .day-btn{
+      border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;text-align:center;cursor:pointer;
+      font-weight:700;
+    }
+    .day-btn small{display:block;color:var(--muted);font-weight:500;margin-top:4px}
+    .day-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .day-btn.active small{color:rgba(255,255,255,.9)}
+    .route-list,.queue-list,.stops-list{display:flex;flex-direction:column;gap:12px}
+    .route-item,.queue-item,.stop-item,.summary-item{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+    }
+    .route-item.active,.stop-item.active{
+      border-color:var(--primary);
+      background:var(--primary-2);
+    }
+    .route-item{cursor:pointer}
+    .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .title{font-weight:700}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{
+      padding:5px 10px;border-radius:999px;background:var(--chip);font-size:12px;color:#3f4b5f;font-weight:600;
+    }
+    .chip.ok{background:var(--success-bg);color:var(--success)}
+    .chip.warn{background:var(--warning-bg);color:var(--warning)}
+    .chip.danger{background:var(--danger-bg);color:var(--danger)}
+    .section-title{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin:2px 0 10px;
+      font-weight:800;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
+    th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+    .btn{
+      border:none;
+      background:var(--primary);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .btn.secondary{background:#e9eef7;color:#27364a}
+    .btn.success{background:var(--success)}
+    .btn.warning{background:#f59e0b}
+    .btn.danger{background:#dc2626}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .two-col{
+      display:grid;grid-template-columns:1.1fr .9fr;gap:16px;
+    }
+    .timeline{
+      position:relative;padding-left:20px;display:flex;flex-direction:column;gap:16px
+    }
+    .timeline::before{
+      content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;background:#d9e2f2;border-radius:4px
+    }
+    .timeline-step{
+      position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 14px
+    }
+    .timeline-step::before{
+      content:"";position:absolute;left:-17px;top:16px;width:10px;height:10px;background:var(--primary);border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #d9e2f2;
+    }
+    .mini{
+      font-size:12px;color:var(--muted)
+    }
+    .highlight{
+      background:#f8fbff;border:1px dashed #bfd2ff;border-radius:14px;padding:12px
+    }
+    .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .kpi{
+      border:1px solid var(--line);background:#fff;border-radius:16px;padding:14px
+    }
+    .kpi strong{display:block;font-size:26px;margin-top:8px}
+    .hidden{display:none}
+
+    /* pedido estilo abarrotera_demo */
+    .vendor-two-col{display:grid; grid-template-columns:1.2fr 1fr; gap:16px}
+    .vendor-form-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+    .vendor-form-grid .full{grid-column:1/-1}
+    .vendor-select,.vendor-input{
+      width:100%;
+      border:1px solid var(--line-demo);
+      background:#fff;
+      color:var(--text-2);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:14px;
+      outline:none;
+    }
+    .vendor-btn{
+      border:1px solid var(--line-demo);
+      background:#fff;
+      color:var(--text-2);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:14px;
+      cursor:pointer;
+      font-weight:600;
+      transition:.2s ease;
+      box-shadow:0 4px 12px rgba(15,23,42,.04);
+    }
+    .vendor-btn:hover{transform:translateY(-1px)}
+    .vendor-btn.primary{background:var(--primary-demo);border-color:var(--primary-demo);color:#fff}
+    .vendor-btn.success{background:var(--success-demo);border-color:var(--success-demo);color:#fff}
+    .vendor-btn.ghost{background:transparent}
+    .mini-stat{
+      border:1px solid var(--line-demo);
+      border-radius:14px;
+      padding:12px;
+      background:#fafcff;
+    }
+    .mini-stat .n{font-size:24px; font-weight:700; margin-top:8px}
+    .mini-stat .small{font-size:12px}
+    .three-col{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    .table-like{display:grid; gap:10px}
+    .cart-row{
+      display:grid;
+      grid-template-columns:1.5fr .7fr .7fr .8fr auto;
+      gap:10px;
+      align-items:center;
+      border:1px solid var(--line-demo);
+      border-radius:14px;
+      padding:10px;
+      background:#fff;
+    }
+    .cart-head{
+      background:#f8fbff;
+      font-size:12px;
+      font-weight:700;
+      color:#475569;
+      text-transform:uppercase;
+    }
+    .stock-list{display:grid; gap:12px}
+    .stock-item{
+      border:1px solid var(--line-demo);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+    }
+    .dispatch-status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+    }
+    .status-pend{background:#fff7ed; color:#b45309}
+    .status-proc{background:#eff6ff; color:#1d4ed8}
+    .status-done{background:#ecfdf5; color:#15803d}
+
+    @media(max-width:1200px){
+      .grid{grid-template-columns:1fr}
+      .two-col,.hero,.vendor-two-col,.vendor-form-grid,.three-col{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div>
+        <h1>Planeación de rutas y remisiones en tiempo real</h1>
+        <p>
+          Demo para abarrotera con dos flujos conectados: el vendedor visualiza qué clientes debe visitar cada día
+          y, en cuanto levanta un pedido, el área de despacho recibe la solicitud para generar remisión y preparar reparto.
+        </p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><small>Pedidos hoy</small><strong id="heroPedidos">8</strong></div>
+        <div class="stat"><small>Remisiones pendientes</small><strong id="heroPendientes">5</strong></div>
+        <div class="stat"><small>Rutas activas</small><strong id="heroRutas">3</strong></div>
+        <div class="stat"><small>Entregas listas</small><strong id="heroListas">3</strong></div>
+      </div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab active" data-view="vendedor">Vista vendedor</button>
+      <button class="tab" data-view="despacho">Vista despacho / remisiones</button>
+      <button class="tab" data-view="control">Vista supervisión</button>
+    </div>
+
+    <div id="view-vendedor" class="view">
+      <div class="grid">
+        <div class="card">
+          <div class="card-header">
+            <h3>Planeación semanal</h3>
+            <span class="chip ok">Ruta diaria</span>
+          </div>
+          <div class="card-body">
+            <div class="section-title">Días programados</div>
+            <div class="day-buttons" id="dayButtons"></div>
+            <div style="height:14px"></div>
+            <div class="section-title">Rutas del día</div>
+            <div class="route-list" id="routeList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 id="routeTitle">Detalle de ruta</h3>
+              <div class="muted" id="routeSubtitle">Selecciona una ruta</div>
+            </div>
+            <div class="inline-actions">
+              <button class="btn secondary" id="btnMarcarSalida">Marcar salida</button>
+              <button class="btn success" id="btnPedidoRapido">Levantar pedido rápido</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="two-col">
+              <div>
+                <div class="section-title">Secuencia de visita</div>
+                <div class="stops-list" id="stopsList"></div>
+              </div>
+              <div>
+                <div class="section-title">Resumen operativo</div>
+                <div class="summary-item">
+                  <div class="row"><span class="muted">Vendedor</span><strong id="summaryVendedor">-</strong></div>
+                  <div class="row"><span class="muted">Unidad</span><strong id="summaryUnidad">-</strong></div>
+                  <div class="row"><span class="muted">Clientes programados</span><strong id="summaryClientes">0</strong></div>
+                  <div class="row"><span class="muted">Pedidos generados</span><strong id="summaryPedidos">0</strong></div>
+                  <div class="row"><span class="muted">Hora estimada fin</span><strong id="summaryFin">-</strong></div>
+                </div>
+                <div style="height:12px"></div>
+                <div class="highlight">
+                  <div class="title">Siguiente parada</div>
+                  <div class="muted" id="nextStopText">Sin selección</div>
+                </div>
+                <div style="height:12px"></div>
+                <div class="section-title">Actividad de ruta</div>
+                <div class="timeline" id="routeTimeline"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Módulo del vendedor</h3>
+              <div class="muted">Levantamiento de pedidos con existencia real al momento.</div>
+            </div>
+            <span class="chip warn">Tiempo real</span>
+          </div>
+          <div class="card-body">
+            <div class="vendor-two-col">
+              <div>
+                <h3 class="section-title" style="margin-top:0">Nuevo pedido</h3>
+                <div class="vendor-form-grid">
+                  <select id="customerSelect" class="vendor-select">
+                    <option value="">Selecciona cliente</option>
+                  </select>
+                  <input id="orderNote" class="vendor-input" placeholder="Observaciones de entrega" />
+                  <select id="productSelect" class="vendor-select full"></select>
+                  <input id="quantityInput" class="vendor-input" type="number" min="1" value="1" />
+                  <button class="vendor-btn primary" id="btnAddToCart">Agregar al pedido</button>
+                </div>
+
+                <div style="margin-top:16px">
+                  <div class="three-col">
+                    <div class="mini-stat">
+                      <div class="muted">Cliente actual</div>
+                      <div class="n small" id="statCustomer">—</div>
+                    </div>
+                    <div class="mini-stat">
+                      <div class="muted">Productos en pedido</div>
+                      <div class="n" id="statLines">0</div>
+                    </div>
+                    <div class="mini-stat">
+                      <div class="muted">Total estimado</div>
+                      <div class="n" id="statTotal">$0</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:16px">
+                  <h3 class="section-title">Detalle del pedido</h3>
+                  <div class="table-like" id="cartTable"></div>
+                  <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap">
+                    <button class="vendor-btn success" id="btnSendOrder">Enviar pedido a remisiones</button>
+                    <button class="vendor-btn ghost" id="btnClearCart">Limpiar pedido</button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="section-title" style="margin-top:0">Existencia real por producto</h3>
+                <div class="stock-list" id="stockList"></div>
+              </div>
+            </div>
+            <div style="height:12px"></div>
+            <div class="muted" id="pedidoMensaje">Selecciona una parada para capturar pedido.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-despacho" class="view hidden">
+      <div class="grid" style="grid-template-columns:420px 1fr 360px;">
+        <div class="card">
+          <div class="card-header">
+            <h3>Cola de remisiones</h3>
+            <span class="chip danger" id="queuePendingChip">Pendientes: 5</span>
+          </div>
+          <div class="card-body">
+            <div class="queue-list" id="queueList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 id="remisionTitle">Detalle de remisión</h3>
+              <div class="muted" id="remisionSubtitle">Selecciona un pedido</div>
+            </div>
+            <div class="inline-actions">
+              <button class="btn warning" id="btnGenerarRemision">Generar remisión</button>
+              <button class="btn success" id="btnListoReparto">Listo para reparto</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="two-col">
+              <div>
+                <div class="section-title">Datos generales</div>
+                <div class="summary-item" id="remisionGeneral">
+                  <div class="row"><span class="muted">Ruta</span><strong>-</strong></div>
+                  <div class="row"><span class="muted">Cliente</span><strong>-</strong></div>
+                  <div class="row"><span class="muted">Vendedor</span><strong>-</strong></div>
+                  <div class="row"><span class="muted">Prioridad</span><strong>-</strong></div>
+                </div>
+                <div style="height:12px"></div>
+                <div class="section-title">Productos del pedido</div>
+                <table>
+                  <thead>
+                    <tr><th>Producto</th><th>Cant.</th><th>Estado</th></tr>
+                  </thead>
+                  <tbody id="remisionItems"></tbody>
+                </table>
+              </div>
+              <div>
+                <div class="section-title">Seguimiento</div>
+                <div class="timeline" id="remisionTimeline"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Resumen reparto</h3>
+            <span class="chip ok">Operación</span>
+          </div>
+          <div class="card-body">
+            <div class="kpi-grid">
+              <div class="kpi"><div class="muted">Pendientes</div><strong id="kpiPendientes">5</strong></div>
+              <div class="kpi"><div class="muted">En remisión</div><strong id="kpiRemision">2</strong></div>
+              <div class="kpi"><div class="muted">Listos</div><strong id="kpiListos">3</strong></div>
+            </div>
+            <div style="height:14px"></div>
+            <div class="section-title">Rutas con carga</div>
+            <div id="routeLoads"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-control" class="view hidden">
+      <div class="card">
+        <div class="card-header">
+          <h3>Control general de operación</h3>
+          <div class="inline-actions">
+            <button class="btn secondary" id="btnSimularPedido">Simular nuevo pedido</button>
+            <button class="btn danger" id="btnReset">Reiniciar demo</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="kpi-grid">
+            <div class="kpi"><div class="muted">Clientes programados hoy</div><strong id="ctrlClientes">14</strong></div>
+            <div class="kpi"><div class="muted">Pedidos generados</div><strong id="ctrlPedidos">8</strong></div>
+            <div class="kpi"><div class="muted">Remisiones listas</div><strong id="ctrlListos">3</strong></div>
+          </div>
+          <div style="height:18px"></div>
+          <div class="section-title">Flujo sugerido</div>
+          <div class="timeline">
+            <div class="timeline-step"><strong>1. Planeación diaria</strong><div class="mini">Se define qué clientes visitará cada vendedor por día y en qué orden.</div></div>
+            <div class="timeline-step"><strong>2. Pedido en campo</strong><div class="mini">El vendedor selecciona la visita, captura cantidades y envía el pedido.</div></div>
+            <div class="timeline-step"><strong>3. Remisión inmediata</strong><div class="mini">Despacho recibe la solicitud por ruta, prepara documentos y separa mercancía.</div></div>
+            <div class="timeline-step"><strong>4. Reparto</strong><div class="mini">Cuando queda listo, el pedido cambia a listo para reparto y sale a entrega.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const baseData = {
+  selectedDay: 'Lunes',
+  selectedRouteId: 'R1',
+  selectedStopId: 'S1',
+  selectedQueueId: 'P-1001',
+  inventory: {
+    'Coca 600 ml': 45,
+    'Sabritas 45 g': 32,
+    'Galletas Marías': 20,
+    'Arroz 1 kg': 18,
+    'Frijol 1 kg': 16
+  },
+  routesByDay: {
+    'Lunes': [
+      {
+        id:'R1',
+        name:'Ruta Norte',
+        vendedor:'Luis Mendoza',
+        unidad:'NP-14',
+        salida:'07:20',
+        fin:'16:30',
+        status:'En ruta',
+        stops:[
+          {id:'S1', cliente:'Abarrotes Lupita', zona:'Col. Centro', ventana:'08:00 - 08:30', visitado:false, prioridad:'Alta'},
+          {id:'S2', cliente:'Miscelánea San Juan', zona:'San Juan', ventana:'09:00 - 09:20', visitado:false, prioridad:'Media'},
+          {id:'S3', cliente:'Mini Súper Gema', zona:'El Cerrito', ventana:'10:15 - 10:45', visitado:true, prioridad:'Alta'},
+          {id:'S4', cliente:'Tienda La Esquina', zona:'Niños Héroes', ventana:'11:30 - 12:00', visitado:false, prioridad:'Baja'}
+        ],
+        timeline:[
+          'Ruta cargada desde preventa',
+          'Salida programada 07:20',
+          '1 pedido ya enviado a remisiones'
+        ]
+      },
+      {
+        id:'R2',
+        name:'Ruta Poniente',
+        vendedor:'María Torres',
+        unidad:'NP-09',
+        salida:'07:45',
+        fin:'17:00',
+        status:'Activa',
+        stops:[
+          {id:'S5', cliente:'Depósito Ramírez', zona:'Las Flores', ventana:'08:30 - 09:00', visitado:false, prioridad:'Alta'},
+          {id:'S6', cliente:'Abarrotes Diana', zona:'Benito Juárez', ventana:'09:40 - 10:10', visitado:false, prioridad:'Media'},
+          {id:'S7', cliente:'Supercito Fer', zona:'La Esperanza', ventana:'11:00 - 11:30', visitado:false, prioridad:'Media'}
+        ],
+        timeline:[
+          'Ruta validada por supervisor',
+          'Sin pedidos enviados aún'
+        ]
+      }
+    ],
+    'Martes': [
+      {
+        id:'R3',
+        name:'Ruta Oriente',
+        vendedor:'Carlos Vega',
+        unidad:'NP-22',
+        salida:'07:15',
+        fin:'16:45',
+        status:'Programada',
+        stops:[
+          {id:'S8', cliente:'Abarrotes Del Valle', zona:'Del Valle', ventana:'08:10 - 08:40', visitado:false, prioridad:'Alta'},
+          {id:'S9', cliente:'Miscelánea Rosy', zona:'Los Pinos', ventana:'09:20 - 09:50', visitado:false, prioridad:'Media'},
+          {id:'S10', cliente:'Tienda Anita', zona:'Vista Hermosa', ventana:'10:30 - 11:00', visitado:false, prioridad:'Baja'}
+        ],
+        timeline:[
+          'Ruta generada para el martes'
+        ]
+      }
+    ],
+    'Miércoles': [],
+    'Jueves': [],
+    'Viernes': []
+  },
+  queue: [
+    {
+      id:'P-1001',
+      ruta:'Ruta Norte',
+      cliente:'Mini Súper Gema',
+      vendedor:'Luis Mendoza',
+      prioridad:'Alta',
+      status:'Pendiente',
+      creado:'08:42',
+      note:'Pedido recibido desde ruta',
+      items:[
+        {producto:'Coca 600 ml', cantidad:6, estado:'Por surtir'},
+        {producto:'Sabritas 45 g', cantidad:4, estado:'Por surtir'}
+      ],
+      tracking:['Pedido recibido desde ruta a las 08:42']
+    },
+    {
+      id:'P-1002',
+      ruta:'Ruta Norte',
+      cliente:'Abarrotes El Sol',
+      vendedor:'Luis Mendoza',
+      prioridad:'Media',
+      status:'En remisión',
+      creado:'09:10',
+      note:'Cobro contra entrega',
+      items:[
+        {producto:'Arroz 1 kg', cantidad:3, estado:'Separado'},
+        {producto:'Frijol 1 kg', cantidad:2, estado:'Separado'}
+      ],
+      tracking:['Pedido recibido a las 09:10','Remisión en captura']
+    },
+    {
+      id:'P-1003',
+      ruta:'Ruta Poniente',
+      cliente:'Depósito Ramírez',
+      vendedor:'María Torres',
+      prioridad:'Alta',
+      status:'Listo para reparto',
+      creado:'09:25',
+      note:'Urgente',
+      items:[
+        {producto:'Coca 600 ml', cantidad:10, estado:'Listo'},
+        {producto:'Galletas Marías', cantidad:5, estado:'Listo'}
+      ],
+      tracking:['Pedido recibido a las 09:25','Remisión generada','Carga lista en andén 2']
+    }
+  ]
+};
+
+let state = JSON.parse(JSON.stringify(baseData));
+let cart = [];
+
+function $(id){ return document.getElementById(id); }
+function money(n){
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(n);
+}
+function productCatalog(){
+  return [
+    { id:1, name:'Coca 600 ml', stock:state.inventory['Coca 600 ml'], price:18 },
+    { id:2, name:'Sabritas 45 g', stock:state.inventory['Sabritas 45 g'], price:17 },
+    { id:3, name:'Galletas Marías', stock:state.inventory['Galletas Marías'], price:24 },
+    { id:4, name:'Arroz 1 kg', stock:state.inventory['Arroz 1 kg'], price:29 },
+    { id:5, name:'Frijol 1 kg', stock:state.inventory['Frijol 1 kg'], price:32 }
+  ];
+}
+function productById(id){
+  return productCatalog().find(p => p.id === id);
+}
+function renderDayButtons(){
+  const days = Object.keys(state.routesByDay);
+  $('dayButtons').innerHTML = days.map(day => `
+    <button class="day-btn ${state.selectedDay===day?'active':''}" onclick="selectDay('${day}')">
+      ${day}<small>${(state.routesByDay[day]||[]).length} rutas</small>
+    </button>
+  `).join('');
+}
+function selectDay(day){
+  state.selectedDay = day;
+  const routes = state.routesByDay[day] || [];
+  state.selectedRouteId = routes[0]?.id || null;
+  state.selectedStopId = routes[0]?.stops[0]?.id || null;
+  cart = [];
+  renderAll();
+}
+function currentRoutes(){
+  return state.routesByDay[state.selectedDay] || [];
+}
+function currentRoute(){
+  return currentRoutes().find(r => r.id === state.selectedRouteId) || null;
+}
+function currentStop(){
+  const route = currentRoute();
+  return route?.stops.find(s => s.id === state.selectedStopId) || null;
+}
+function currentQueue(){
+  return state.queue.find(q => q.id === state.selectedQueueId) || null;
+}
+function renderRouteList(){
+  const routes = currentRoutes();
+  $('routeList').innerHTML = routes.length ? routes.map(r => `
+    <div class="route-item ${r.id===state.selectedRouteId?'active':''}" onclick="selectRoute('${r.id}')">
+      <div class="row">
+        <div class="title">${r.name}</div>
+        <span class="chip ${r.status==='En ruta'?'ok':'warn'}">${r.status}</span>
+      </div>
+      <div class="muted">${r.vendedor} · Unidad ${r.unidad}</div>
+      <div class="chips">
+        <span class="chip">${r.stops.length} clientes</span>
+        <span class="chip">Salida ${r.salida}</span>
+        <span class="chip">${r.fin} fin</span>
+      </div>
+    </div>
+  `).join('') : `<div class="route-item"><div class="muted">No hay rutas programadas para este día.</div></div>`;
+}
+function selectRoute(routeId){
+  state.selectedRouteId = routeId;
+  const route = currentRoute();
+  state.selectedStopId = route?.stops[0]?.id || null;
+  cart = [];
+  renderAll();
+}
+function selectStop(stopId){
+  state.selectedStopId = stopId;
+  cart = [];
+  renderAll();
+}
+function selectQueue(queueId){
+  state.selectedQueueId = queueId;
+  renderAll();
+}
+function renderRouteDetail(){
+  const route = currentRoute();
+  if(!route){
+    $('routeTitle').textContent = 'Detalle de ruta';
+    $('routeSubtitle').textContent = 'No hay ruta seleccionada';
+    $('stopsList').innerHTML = '<div class="stop-item"><div class="muted">Selecciona un día con rutas.</div></div>';
+    $('summaryVendedor').textContent = '-';
+    $('summaryUnidad').textContent = '-';
+    $('summaryClientes').textContent = '0';
+    $('summaryPedidos').textContent = '0';
+    $('summaryFin').textContent = '-';
+    $('nextStopText').textContent = 'Sin selección';
+    $('routeTimeline').innerHTML = '';
+    return;
+  }
+  $('routeTitle').textContent = route.name;
+  $('routeSubtitle').textContent = `${state.selectedDay} · ${route.vendedor} · ${route.status}`;
+  $('stopsList').innerHTML = route.stops.map((s, idx) => `
+    <div class="stop-item ${s.id===state.selectedStopId?'active':''}" onclick="selectStop('${s.id}')">
+      <div class="row">
+        <div>
+          <div class="title">${idx+1}. ${s.cliente}</div>
+          <div class="muted">${s.zona} · ${s.ventana}</div>
+        </div>
+        <span class="chip ${s.prioridad==='Alta'?'danger':s.prioridad==='Media'?'warn':'ok'}">${s.prioridad}</span>
+      </div>
+      <div class="chips">
+        <span class="chip ${s.visitado?'ok':'warn'}">${s.visitado?'Visitado':'Pendiente'}</span>
+      </div>
+    </div>
+  `).join('');
+  $('summaryVendedor').textContent = route.vendedor;
+  $('summaryUnidad').textContent = route.unidad;
+  $('summaryClientes').textContent = route.stops.length;
+  $('summaryPedidos').textContent = state.queue.filter(q => q.ruta === route.name).length;
+  $('summaryFin').textContent = route.fin;
+  const next = route.stops.find(s => !s.visitado) || route.stops[0];
+  $('nextStopText').textContent = next ? `${next.cliente} · ${next.ventana}` : 'Ruta concluida';
+  $('routeTimeline').innerHTML = route.timeline.map(t => `<div class="timeline-step"><strong>${t}</strong></div>`).join('');
+}
+
+/* módulo pedido como abarrotera_demo */
+function renderCustomers(){
+  const stop = currentStop();
+  const route = currentRoute();
+  let customers = [];
+  if(route) customers = route.stops.map(s => s.cliente);
+  const selected = stop?.cliente || '';
+  $('customerSelect').innerHTML = '<option value="">Selecciona cliente</option>' + customers.map(c => `<option ${c===selected?'selected':''}>${c}</option>`).join('');
+}
+function renderProductsSelect(){
+  $('productSelect').innerHTML = productCatalog().map(p => `<option value="${p.id}">${p.name} · Existencia: ${p.stock} · ${money(p.price)}</option>`).join('');
+}
+function renderStock(){
+  $('stockList').innerHTML = productCatalog().map(p => {
+    const cls = p.stock <= 5 ? 'danger' : p.stock <= 10 ? 'warn' : 'ok';
+    const txt = p.stock <= 5 ? 'Crítico' : p.stock <= 10 ? 'Bajo' : 'Disponible';
+    return `
+      <div class="stock-item">
+        <div class="row">
+          <div>
+            <div class="title">${p.name}</div>
+            <div class="muted">Precio sugerido: ${money(p.price)}</div>
+          </div>
+          <span class="chip ${cls}">${txt}</span>
+        </div>
+        <div class="chips">
+          <span class="chip">Existencia real: ${p.stock}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+function renderCart(){
+  const el = $('cartTable');
+  if(!cart.length){
+    el.innerHTML = '<div class="route-item"><div class="muted">Todavía no agregas productos al pedido.</div></div>';
+  } else {
+    const head = '<div class="cart-row cart-head"><div>Producto</div><div>Cantidad</div><div>Precio</div><div>Subtotal</div><div></div></div>';
+    const rows = cart.map((line, index) => {
+      const p = productById(line.productId);
+      return `<div class="cart-row">
+        <div>${p.name}</div>
+        <div>${line.qty}</div>
+        <div>${money(p.price)}</div>
+        <div>${money(p.price * line.qty)}</div>
+        <button class="vendor-btn ghost" onclick="removeCartLine(${index})">Quitar</button>
+      </div>`;
+    }).join('');
+    el.innerHTML = head + rows;
+  }
+  $('statLines').textContent = cart.reduce((a,b)=>a+b.qty,0);
+  $('statTotal').textContent = money(cart.reduce((sum,line)=>sum+(productById(line.productId).price*line.qty),0));
+  $('statCustomer').textContent = $('customerSelect').value || '—';
+
+  const stop = currentStop();
+  if(stop){
+    $('pedidoMensaje').textContent = `Capturando pedido para ${stop.cliente} en ${currentRoute().name}.`;
+  } else {
+    $('pedidoMensaje').textContent = 'Selecciona una parada para capturar pedido.';
+  }
+}
+function addToCart(){
+  const productId = Number($('productSelect').value);
+  const qty = Number($('quantityInput').value);
+  if(!$('customerSelect').value){
+    $('pedidoMensaje').textContent = 'Selecciona primero un cliente de la ruta.';
+    return;
+  }
+  if(!productId || qty <= 0){
+    $('pedidoMensaje').textContent = 'Selecciona producto y cantidad válida.';
+    return;
+  }
+  const product = productById(productId);
+  if(qty > product.stock){
+    $('pedidoMensaje').textContent = `No hay suficiente existencia real. Disponible: ${product.stock}`;
+    return;
+  }
+  const existing = cart.find(x => x.productId === productId);
+  const currentCartQty = existing ? existing.qty : 0;
+  if(currentCartQty + qty > product.stock){
+    $('pedidoMensaje').textContent = `La cantidad total excede la existencia real de ${product.name}.`;
+    return;
+  }
+  if(existing) existing.qty += qty; else cart.push({ productId, qty });
+  $('pedidoMensaje').textContent = `Producto agregado al pedido.`;
+  renderCart();
+}
+function clearCart(){
+  cart = [];
+  renderCart();
+}
+function sendPedidoToQueue(){
+  const customer = $('customerSelect').value;
+  const route = currentRoute();
+  const stop = currentStop();
+  if(!customer || !cart.length || !route){
+    $('pedidoMensaje').textContent = 'Debes seleccionar cliente y agregar productos.';
+    return;
+  }
+
+  cart.forEach(line => {
+    const p = productById(line.productId);
+    state.inventory[p.name] -= line.qty;
+  });
+
+  const id = 'P-' + String(Math.floor(Math.random()*9000)+1000);
+  state.queue.unshift({
+    id,
+    ruta: route.name,
+    cliente: customer,
+    vendedor: route.vendedor,
+    prioridad: stop?.prioridad || 'Media',
+    status:'Pendiente',
+    creado: new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}),
+    note: $('orderNote').value || 'Pedido capturado en ruta',
+    items: cart.map(line => {
+      const p = productById(line.productId);
+      return { producto: p.name, cantidad: line.qty, estado:'Por surtir' };
+    }),
+    tracking:[
+      `Pedido recibido desde ${route.name}`,
+      `Cliente ${customer}`
+    ]
+  });
+
+  route.timeline.unshift(`Pedido enviado a remisiones para ${customer}`);
+  if(stop) stop.visitado = true;
+  state.selectedQueueId = id;
+  cart = [];
+  $('orderNote').value = '';
+  $('quantityInput').value = 1;
+  $('pedidoMensaje').textContent = `Pedido ${id} enviado a remisiones con inventario descontado en tiempo real.`;
+  renderAll();
+}
+
+function renderQueue(){
+  const pendingCount = state.queue.filter(q=>q.status==='Pendiente').length;
+  $('queuePendingChip').textContent = `Pendientes: ${pendingCount}`;
+  $('queueList').innerHTML = state.queue.map(q => `
+    <div class="queue-item ${q.id===state.selectedQueueId?'active':''}" onclick="selectQueue('${q.id}')" style="cursor:pointer;">
+      <div class="row">
+        <div class="title">${q.id}</div>
+        <span class="dispatch-status ${q.status==='Pendiente'?'status-pend':q.status==='En remisión'?'status-proc':'status-done'}">${q.status}</span>
+      </div>
+      <div><strong>${q.cliente}</strong></div>
+      <div class="muted">${q.ruta} · ${q.vendedor}</div>
+      <div class="chips">
+        <span class="chip">${q.creado}</span>
+        <span class="chip">${q.items.length} productos</span>
+        <span class="chip ${q.prioridad==='Alta'?'danger':'warn'}">${q.prioridad}</span>
+      </div>
+    </div>
+  `).join('');
+}
+function renderRemisionDetail(){
+  const q = currentQueue();
+  if(!q){
+    $('remisionTitle').textContent = 'Detalle de remisión';
+    $('remisionSubtitle').textContent = 'Selecciona un pedido';
+    $('remisionGeneral').innerHTML = '<div class="muted">Sin datos</div>';
+    $('remisionItems').innerHTML = '';
+    $('remisionTimeline').innerHTML = '';
+    return;
+  }
+  $('remisionTitle').textContent = `Pedido ${q.id}`;
+  $('remisionSubtitle').textContent = `${q.cliente} · ${q.ruta}`;
+  $('remisionGeneral').innerHTML = `
+    <div class="row"><span class="muted">Ruta</span><strong>${q.ruta}</strong></div>
+    <div class="row"><span class="muted">Cliente</span><strong>${q.cliente}</strong></div>
+    <div class="row"><span class="muted">Vendedor</span><strong>${q.vendedor}</strong></div>
+    <div class="row"><span class="muted">Prioridad</span><strong>${q.prioridad}</strong></div>
+    <div class="row"><span class="muted">Estatus</span><strong>${q.status}</strong></div>
+    <div class="row"><span class="muted">Nota</span><strong>${q.note || '-'}</strong></div>
+  `;
+  $('remisionItems').innerHTML = q.items.map(it => `
+    <tr>
+      <td>${it.producto}</td>
+      <td>${it.cantidad}</td>
+      <td><span class="chip ${it.estado==='Listo'?'ok':it.estado==='Separado'?'warn':'danger'}">${it.estado}</span></td>
+    </tr>
+  `).join('');
+  $('remisionTimeline').innerHTML = q.tracking.map(t => `<div class="timeline-step"><strong>${t}</strong></div>`).join('');
+}
+function generarRemision(){
+  const q = currentQueue();
+  if(!q) return;
+  q.status = 'En remisión';
+  q.items.forEach(it => it.estado = 'Separado');
+  q.tracking.push('Remisión generada y mercancía separada');
+  renderAll();
+}
+function listoReparto(){
+  const q = currentQueue();
+  if(!q) return;
+  q.status = 'Listo para reparto';
+  q.items.forEach(it => it.estado = 'Listo');
+  q.tracking.push('Pedido listo para reparto');
+  renderAll();
+}
+function renderRouteLoads(){
+  const grouped = {};
+  state.queue.forEach(q => {
+    if(!grouped[q.ruta]) grouped[q.ruta] = {pedidos:0, piezas:0, listos:0};
+    grouped[q.ruta].pedidos += 1;
+    grouped[q.ruta].piezas += q.items.reduce((a,b)=>a+b.cantidad,0);
+    if(q.status==='Listo para reparto') grouped[q.ruta].listos += 1;
+  });
+  $('routeLoads').innerHTML = Object.entries(grouped).map(([ruta, data]) => `
+    <div class="summary-item" style="margin-bottom:10px;">
+      <div class="row"><strong>${ruta}</strong><span class="chip">${data.pedidos} pedidos</span></div>
+      <div class="row"><span class="muted">Piezas</span><strong>${data.piezas}</strong></div>
+      <div class="row"><span class="muted">Listos</span><strong>${data.listos}</strong></div>
+    </div>
+  `).join('') || '<div class="muted">Sin carga pendiente.</div>';
+}
+function updateKpis(){
+  const pendientes = state.queue.filter(q=>q.status==='Pendiente').length;
+  const remision = state.queue.filter(q=>q.status==='En remisión').length;
+  const listos = state.queue.filter(q=>q.status==='Listo para reparto').length;
+  const pedidos = state.queue.length;
+  const rutas = Object.values(state.routesByDay).flat().length;
+  const clientes = Object.values(state.routesByDay).flat().reduce((a,b)=>a+b.stops.length,0);
+  $('heroPedidos').textContent = pedidos;
+  $('heroPendientes').textContent = pendientes;
+  $('heroRutas').textContent = rutas;
+  $('heroListas').textContent = listos;
+  $('kpiPendientes').textContent = pendientes;
+  $('kpiRemision').textContent = remision;
+  $('kpiListos').textContent = listos;
+  $('ctrlClientes').textContent = clientes;
+  $('ctrlPedidos').textContent = pedidos;
+  $('ctrlListos').textContent = listos;
+}
+function renderAll(){
+  renderDayButtons();
+  renderRouteList();
+  renderRouteDetail();
+  renderCustomers();
+  renderProductsSelect();
+  renderStock();
+  renderCart();
+  renderQueue();
+  renderRemisionDetail();
+  renderRouteLoads();
+  updateKpis();
+}
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+    $('view-'+btn.dataset.view).classList.remove('hidden');
+  });
+});
+window.selectDay = selectDay;
+window.selectRoute = selectRoute;
+window.selectStop = selectStop;
+window.selectQueue = selectQueue;
+window.removeCartLine = function(index){
+  cart.splice(index, 1);
+  renderCart();
+};
+
+$('btnAddToCart').addEventListener('click', addToCart);
+$('btnSendOrder').addEventListener('click', sendPedidoToQueue);
+$('btnClearCart').addEventListener('click', clearCart);
+$('btnGenerarRemision').addEventListener('click', generarRemision);
+$('btnListoReparto').addEventListener('click', listoReparto);
+$('btnMarcarSalida').addEventListener('click', ()=>{
+  const route = currentRoute();
+  if(route){
+    route.status = 'En ruta';
+    route.timeline.unshift('Salida confirmada desde app móvil');
+    renderAll();
+  }
+});
+$('btnPedidoRapido').addEventListener('click', ()=>{
+  const firstProduct = productCatalog()[0];
+  const stop = currentStop();
+  if(stop){
+    $('customerSelect').value = stop.cliente;
+    $('productSelect').value = firstProduct.id;
+    $('quantityInput').value = 2;
+    $('pedidoMensaje').textContent = `Se preparó una captura rápida para ${stop.cliente}.`;
+    renderCart();
+  }
+});
+$('btnSimularPedido').addEventListener('click', ()=>{
+  state.queue.unshift({
+    id:'P-' + String(Math.floor(Math.random()*9000)+1000),
+    ruta:'Ruta Poniente',
+    cliente:'Abarrotes Diana',
+    vendedor:'María Torres',
+    prioridad:'Media',
+    status:'Pendiente',
+    creado:new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}),
+    note:'Pedido simulado desde supervisión',
+    items:[{producto:'Galletas Marías', cantidad:3, estado:'Por surtir'}],
+    tracking:['Pedido simulado desde supervisión']
+  });
+  state.selectedQueueId = state.queue[0].id;
+  renderAll();
+});
+$('btnReset').addEventListener('click', ()=>{
+  state = JSON.parse(JSON.stringify(baseData));
+  cart = [];
+  renderAll();
+});
+$('customerSelect').addEventListener('change', renderCart);
+
+renderAll();
+</script>
+</body>
+</html>
